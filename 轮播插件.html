@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮播插件编写</title>
+<style>
+*{
+	padding:0;
+	margin:0;
+}
+
+.lunbo{
+	width:899px;
+	height: 399px;
+	margin:00 auto;
+	overflow: hidden;
+	background:#f8f8f8;
+	position:relative;
+}
+.lunbo .lunbo-swiper{
+	width:726px;
+	height:399px;
+	margin:0 auto;
+	position:relative;
+	overflow:hidden;
+}
+.lunbo .slide{
+	position:absolute;
+	left:0;
+	top:0;
+	width:100%;
+	height:100%;
+	padding:33px 36px 0 45px;
+	box-sizing:border-box;
+	overflow:hidden;
+	display:none;
+	background:#ddd;
+}
+.lunbo .slide.block{
+	display:block;
+}
+.switch-btn{
+	position:absolute;
+	left:0px;
+	bottom:10px;
+	width:100%;
+	height:29px;
+	text-align: center;
+}
+.switch-btn a{
+	display:inline-block;
+	width:30px;
+	height:29px;
+	background:url(images/page1_tab_normal.png) no-repeat;
+	margin:0 7px;
+}
+.switch-btn a.cur{
+	background:url(images/page1_tab_hnormal.png) no-repeat;
+}
+.prev-btn{
+	position:absolute;
+	left:32px;
+	top:50%;
+	display: block;
+	width:32px;
+	height: 64px;
+	margin-top:-40px;/*不居中，故意加大的好看*/
+	background: url(images/page1_tab_left.png) center center no-repeat;
+}
+.next-btn{
+	position:absolute;
+	right:32px;
+	top:50%;
+	display: block;
+	width:32px;
+	height: 64px;
+	margin-top:-40px;/*不居中，故意加大的好看*/
+	background: url(images/page1_tab_right.png) center center no-repeat;
+}
+</style>
+</head>
+<body>
+<div class="lunbo lunbo1">
+	<div class="lunbo-swiper">
+		<div class="slide slide1 block">
+			第一页
+		</div>
+		<div class="slide slide2">
+			第二页
+		</div>
+		<div class="slide slide3">
+			第三页
+		</div>
+		<div class="slide slide4">
+			第四页
+		</div>
+	</div>
+	<!---->
+	<div class="switch-btn">
+		<a class="cur" href="javascript:;"></a>
+		<a href="javascript:;"></a>
+		<a href="javascript:;"></a>
+		<a href="javascript:;"></a>
+	</div>
+	<a class="prev-btn" href="javascript:;"></a>
+	<a class="next-btn" href="javascript:;"></a>
+</div>
+<script src="../jquery-1.11.3.min.js"></script>
+<script>
+/*插件*/
+(function($){
+	$.fn.extend({
+		Lunbo:function(options){
+			var defaults={
+				current:"cur",
+				time:2000,
+				rightBtn:".next-btn",
+				leftBtn:".prev-btn",
+				num:4,
+				eventDefault:"click",
+				cont:".lunbo-swiper",
+				btncont:".switch-btn",
+				contSlide:".slide",
+				btncontA:"a"
+			};
+			var options=$.extend(defaults,options);
+			var index=0;
+			var timer=null;
+			this.each(function(){
+				var $this=$(this);
+				var cont=$(options.cont);
+				var btncont=$(options.btncont);
+				/*自动滚动*/
+				function autoScroll(){
+					timer=setInterval(function(){
+						index++;
+						if(index>=options.num){
+							index=0;
+						}
+						cont.find(options.contSlide).eq(index).show().siblings().hide();
+						btncont.find(options.btncontA).eq(index).addClass(options.current).siblings().removeClass(options.current);
+					},options.time);
+				}
+				autoScroll();
+				/*自动和切换冲突*/
+				$this.mouseover(function(event) {
+					clearInterval(timer);
+				});
+				$this.mouseout(function(event) {
+					autoScroll();
+				});
+				/*右箭头*/
+				$(options.rightBtn).on(options.eventDefault,function(){
+					index++;
+					if(index>=options.num){
+						index=0;
+					}
+					cont.find(options.contSlide).eq(index).show().siblings().hide();
+					btncont.find(options.btncontA).eq(index).addClass(options.current).siblings().removeClass(options.current);
+				});
+				/*左箭头*/
+				$(options.leftBtn).on(options.eventDefault,function(){
+					index--;
+					if(index<0){
+						index=options.num-1;
+					}
+					cont.find(options.contSlide).eq(index).show().siblings().hide();
+					btncont.find(options.btncontA).eq(index).addClass(options.current).siblings().removeClass(options.current);
+				})
+				/*小圆点*/
+				btncont.find(options.btncontA).each(function(i){
+					$(this).on(options.eventDefault,function(){
+						$(this).addClass(options.current).siblings().removeClass(options.current);
+						index=i;
+						cont.find(options.contSlide).eq(index).show().siblings().hide();
+					})
+				})
+			})
+			return this;
+		}
+	})
+})(jQuery)
+/*插件*/
+$(function(){
+	$(".lunbo1").Lunbo();
+})
+</script>
+</body>
+</html>
